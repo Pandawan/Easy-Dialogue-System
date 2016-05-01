@@ -60,6 +60,7 @@ namespace Dialogue
                     //sys.AddToQueue(() => sys.DisplayDialogue(sys.Dialogue("me", 1, 1)));
                     //sys.AddToQueue(() => sys.Talk((string)parameters[0], (int)parameters[1], (int)parameters[2]));
                     //method.Invoke(sys, parameters.ToArray());
+
                     sys.AddToQueue(() => method.Invoke(sys, parameters.ToArray()));
 
                 }

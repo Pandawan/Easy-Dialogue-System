@@ -36,7 +36,7 @@ namespace Dialogue
                 Debug.LogError("File not found or version is invalid!");
                 return;
             }
-            Test(7);
+            Test(5);
 
             //st.ReadStory(this);
         }
@@ -80,11 +80,20 @@ namespace Dialogue
 
             if (testingCode == 0 || testingCode == 4)
             {
+                Debug.Log("Testing Wait()");
                 AddToQueue(() => Wait((int)0.5));
                 AddToQueue(() => Talk("me", 1, 1));
             }
 
             if (testingCode == 0 || testingCode == 5)
+            {
+                Debug.Log("Testing WaitForInput()");
+                AddToQueue(() => Talk("me", 1, 2));
+                AddToQueue(() => WaitForInput("Return"));
+                AddToQueue(() => Talk("me", 1, 1));
+            }
+
+            if (testingCode == 0 || testingCode == 6)
             {
                 Debug.Log("Using Interact() with All");
                 AddToQueue(() => StartCoroutine(InteractAll("player", 0, 1, "me", 1, 1)));
@@ -92,20 +101,327 @@ namespace Dialogue
                 AddToQueue(() => Talk("me", 1, 1));
             }
 
-            if (testingCode == 0 || testingCode == 6)
+            if (testingCode == 0 || testingCode == 7)
             {
                 Debug.Log("Using Interact() with Only one");
-                AddToQueue(() => StartCoroutine(InteractOne("player", 0, 1, "me", 1, "Part2")));
+                AddToQueue(() => InteractOne("player", 0, 1, "me", 1, "Part2"));
                 AddToQueue(() => Wait((int)0.5));
                 AddToQueue(() => Talk("me", 1, 1));
             }
 
-            if (testingCode == 0 || testingCode == 7)
+            if (testingCode == 0 || testingCode == 8)
             {
                 Debug.Log("Displaying Title()");
                 AddToQueue(() => Title(1, 2));
             }
         }
+
+        // BASIC DIALOGUE
+
+        /// <summary>
+        /// Display a dialogue to the GUI System
+        /// </summary>
+        /// <param name="text">Text to display</param>
+        private void DisplayDialogue(string text)
+        {
+            if (GetComponent<GUISystem>().DisplayDialogue(text))
+            {
+                actionDone = true;
+            }
+            else
+            {
+                DisplayDialogue(text, 1);
+            }
+        }
+
+        /// <summary>
+        /// DO NOT USE! This is only used internally!
+        /// </summary>
+        private void DisplayDialogue(string text, int numTries)
+        {
+            if (GetComponent<GUISystem>().DisplayDialogue(text))
+                actionDone = true;
+            else
+            {
+                if (numTries > 10)
+                {
+                    DisplayDialogue(text, numTries + 1);
+                }
+                else
+                {
+                    actionDone = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Use this to make a character say a text.
+        /// </summary>
+        /// <param name="speaker">Speaker saying the dialogue</param>
+        /// <param name="partID">Part of the dialogue</param>
+        /// <param name="textID">Id of the text to use</param>
+        public void Talk(string speaker, int partID, int textID)
+        {
+            DisplayDialogue(Dialogue(speaker, partID, textID));
+        }
+
+        /// <summary>
+        /// Displays the text given as a title
+        /// </summary>
+        /// <param name="partID">Text to display</param>
+        /// <param name="time">Time in seconds that the title should show</param>
+        public void Title(int partID, int time)
+        {
+            GetComponent<GUISystem>().DisplayTitle(Part(partID), time);
+        }
+
+
+        // DIALOGUE WITH CHOICE
+
+        /// <summary>
+        /// Creates an interaction where the player chooses what to say! This one makes it so you go back to the menu after doing one.
+        /// </summary>
+        /// <param name="speaker">Who is talking, used in the file</param>
+        /// <param name="partID">What part is that in, used in file</param>
+        /// <param name="optionID">What optionID is it in, used in file</param>
+        /// <param name="responder">Who is saying the responses, used in the file</param>
+        /// <param name="optionID">What responseID is it in, used in file</param>
+        public void InteractAll(string speaker, int partID, int optionID, string responder, int responseID) // Allowing all of them
+        {
+            StartCoroutine(InteractAllCo(speaker, partID, optionID, responder, responseID));
+        }
+
+        /// <summary>
+        /// Creates an interaction where the player chooses what to say! This one makes it so you go back to the menu after doing one. This one requires StartCoroutine()
+        /// </summary>
+        /// <param name="speaker">Who is talking, used in the file</param>
+        /// <param name="partID">What part is that in, used in file</param>
+        /// <param name="optionID">What optionID is it in, used in file</param>
+        /// <param name="responder">Who is saying the responses, used in the file</param>
+        /// <param name="optionID">What responseID is it in, used in file</param>
+        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
+        {
+            string[] options = Choice(speaker, partID, optionID);
+            string[] responses = Responses(responder, partID, responseID);
+
+
+
+            while (true)
+            {
+                if (waitType == 0) // Wait 2 seconds
+                {
+                    while (GetComponent<GUISystem>().DisplayChoices(options, responses) == false)
+                    {
+                        yield return null;
+                    }
+                }
+                else if (waitType == 1) // Wait until space
+                {
+                    while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Space") == false)
+                    {
+                        yield return null;
+                    }
+                }
+                else if (waitType == 2) // Wait until Fire
+                {
+                    while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Fire") == false)
+                    {
+                        yield return null;
+                    }
+                }
+
+                actionDone = true;
+                yield break;
+            }
+        }
+
+        /// <summary>
+        /// Creates an interaction where the player chooses what to say! This one makes it so you can't go back to the menu after doing one.
+        /// </summary>
+        /// <param name="speaker">Who is talking, used in the file</param>
+        /// <param name="partID">What part is that in, used in file</param>
+        /// <param name="optionID">What optionID is it in, used in file</param>
+        /// <param name="dataName">What to call the data saved, this is used to save the player's choice to be used for different outcomes.</param>
+        /// <param name="responder">Who is saying the responses, used in the file</param>
+        /// <param name="optionID">What responseID is it in, used in file</param>
+        /// <param name="dataName">Name of the data to keep/save for later use. (Used for different outcomes)</param>
+        public void InteractOne(string speaker, int partID, int optionID, string responder, int responseID, string dataName) // Allowing only one 
+        {
+            StartCoroutine(InteractOneCo(speaker, partID, optionID, responder, responseID, dataName));
+        }
+
+
+        // WAITING
+
+        /// <summary>
+        /// Wait for the given amount of time until proceeding to the next action
+        /// </summary>
+        /// <param name="time">Time in seconds to wait, ex: 0.5</param>
+        public void Wait(int time)
+        {
+            StartCoroutine_Auto(WaitCo((float)time));
+        }
+
+        /// <summary>
+        /// Wait for an input before continuing, Keyboard and KeyCodes only!
+        /// </summary>
+        /// <param name="input">QAny Keycode, Ex: Q, Esc</param>
+        public void WaitForInput(KeyCode input) { StartCoroutine(WaitForInputCo(input)); }
+
+        /// <summary>
+        /// Wait for an input before continuing, Referenced Unity Input only!
+        /// </summary>
+        /// <param name="input">Any KeyCode referenced in Unity's Input Manager</param>
+        public void WaitForInput(string input) { StartCoroutine(WaitForInputCo(input)); }
+
+        // CHARACTER SPRITES
+
+        // TODO: Make the displaying of character system!
+        // TODO: Make the chaging of character sprite system!
+        // TODO: Make the animation of character system!
+        // TODO: Make the removal of character system
+
+        // QUEUE
+
+        /// <summary>
+        /// Adds an action (method to execute) in a queue, which will run one after the other. EX: AddToQueue(() => Wait(1));
+        /// </summary>
+        /// <param name="action"></param>
+        public void AddToQueue(Action action)
+        {
+            actionQueue.Add(action);
+        }
+
+        /// <summary>
+        /// Executes the first action of the queue and removes it
+        /// </summary>
+        public void ExecuteQueue()
+        {
+            if (actionDone)
+            {
+                actionDone = false;
+
+                actionQueue[0]();
+
+                actionQueue.RemoveAt(0);
+            }
+        }
+
+        /// <summary>
+        /// Removes an action from the action/event queue based on index
+        /// </summary>
+        /// <param name="index">The index of the queue item to remove</param>
+        public void RemoveInQueue(int index)
+        {
+            actionQueue.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// Removes a the first occurence of the given action
+        /// </summary>
+        /// <param name="action">The action to remove</param>
+        public void RemoveInQueue(Action action)
+        {
+            actionQueue.Remove(action);
+        }
+
+        /// <summary>
+        /// Allows to change actionDone's value to the given value
+        /// </summary>
+        /// <param name="set">Value to change actionDone by</param>
+        public void SetActionDone (bool set)
+        {
+            actionDone = set;
+        }
+
+
+        // WORK METHODS \\
+
+
+        // WAITs
+
+        // Does all the work
+        private IEnumerator WaitCo(float time)
+        {
+            yield return new WaitForSeconds(time);
+            actionDone = true;
+        }
+
+        //Does all the work
+        private IEnumerator WaitForInputCo(KeyCode input)
+        {
+            while (true)
+            {
+                while (!Input.GetKeyDown(input))
+                {
+                    GetComponent<GUISystem>().UsingSpace(input.ToString());
+                    yield return null;
+                }
+
+                actionDone = true;
+                yield return null;
+            }
+        }
+
+        //Does all the work
+        private IEnumerator WaitForInputCo(string input)
+        {
+            Debug.Log("Oh Yeah!");
+            while (true)
+            {
+                while (!Input.GetButtonDown(input))
+                {
+                    GetComponent<GUISystem>().UsingSpace(input);
+                    Debug.Log("Waiting for input");
+                    yield return null;
+                }
+
+                Debug.Log("Found input!");
+                actionDone = true;
+                yield return null;
+            }
+        }
+
+
+        // INTERACTIONS
+
+        // Just a Co version that handles all the work
+        private IEnumerator InteractOneCo(string speaker, int partID, int optionID, string responder, int responseID, string dataName) // Allowing only one
+        {
+            string[] options = Choice(speaker, partID, optionID);
+            string[] responses = Responses(responder, partID, responseID);
+
+            while (true)
+            {
+                while (GetComponent<GUISystem>().DisplayChoices(options, responses, dataName, "Space") == false)
+                {
+                    yield return null;
+                }
+
+                actionDone = true;
+                yield break;
+            }
+        }
+
+        // Just a Co version that handles all the work
+        private IEnumerator InteractAllCo(string speaker, int partID, int optionID, string responder, int responseID) // Allowing all of them
+        {
+            string[] options = Choice(speaker, partID, optionID);
+            string[] responses = Responses(responder, partID, responseID);
+
+            while (true)
+            {
+
+                while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Space") == false)
+                {
+                    yield return null;
+                }
+
+                actionDone = true;
+                yield break;
+            }
+        }
+
 
         // GETTING DATA FROM FILE
 
@@ -185,280 +501,6 @@ namespace Dialogue
 
             return optionsFinal.ToArray();
         }
-
-
-        // BASIC DIALOGUE
-
-        /// <summary>
-        /// Display a dialogue to the GUI System
-        /// </summary>
-        /// <param name="text">Text to display</param>
-        private void DisplayDialogue(string text)
-        {
-            if (GetComponent<GUISystem>().DisplayDialogue(text))
-                actionDone = true;
-            else
-            {
-                DisplayDialogue(text, 1);
-            }
-        }
-
-        /// <summary>
-        /// DO NOT USE! This is only used internally!
-        /// </summary>
-        private void DisplayDialogue(string text, int numTries)
-        {
-            if (GetComponent<GUISystem>().DisplayDialogue(text))
-                actionDone = true;
-            else
-            {
-                if (numTries > 10)
-                {
-                    DisplayDialogue(text, numTries + 1);
-                }
-                else
-                {
-                    actionDone = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Use this to make a character say a text.
-        /// </summary>
-        /// <param name="speaker">Speaker saying the dialogue</param>
-        /// <param name="partID">Part of the dialogue</param>
-        /// <param name="textID">Id of the text to use</param>
-        public void Talk(string speaker, int partID, int textID)
-        {
-            DisplayDialogue(Dialogue(speaker, partID, textID));
-        }
-
-        /// <summary>
-        /// Displays the text given as a title
-        /// </summary>
-        /// <param name="partID">Text to display</param>
-        /// <param name="time">Time in seconds that the title should show</param>
-        public void Title(int partID, int time)
-        {
-            GetComponent<GUISystem>().DisplayTitle(Part(partID), time)
-        }
-
-
-        // DIALOGUE WITH CHOICE
-
-        /// <summary>
-        /// Creates an interaction where the player chooses what to say! This one makes it so you go back to the menu after doing one.
-        /// </summary>
-        /// <param name="speaker">Who is talking, used in the file</param>
-        /// <param name="partID">What part is that in, used in file</param>
-        /// <param name="optionID">What optionID is it in, used in file</param>
-        /// <param name="responder">Who is saying the responses, used in the file</param>
-        /// <param name="optionID">What responseID is it in, used in file</param>
-        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID) // Allowing all of them
-        {
-            string[] options = Choice(speaker, partID, optionID);
-            string[] responses = Responses(responder, partID, responseID);
-
-            while (true)
-            {
-
-                while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Space") == false)
-                {
-                    yield return null;
-                }
-
-                actionDone = true;
-                yield break;
-            }
-        }
-
-
-        /// <summary>
-        /// Creates an interaction where the player chooses what to say! This one makes it so you go back to the menu after doing one.
-        /// </summary>
-        /// <param name="speaker">Who is talking, used in the file</param>
-        /// <param name="partID">What part is that in, used in file</param>
-        /// <param name="optionID">What optionID is it in, used in file</param>
-        /// <param name="responder">Who is saying the responses, used in the file</param>
-        /// <param name="optionID">What responseID is it in, used in file</param>
-        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
-        {
-            string[] options = Choice(speaker, partID, optionID);
-            string[] responses = Responses(responder, partID, responseID);
-
-
-
-            while (true)
-            {
-                if (waitType == 0) // Wait 2 seconds
-                {
-                    while (GetComponent<GUISystem>().DisplayChoices(options, responses) == false)
-                    {
-                        yield return null;
-                    }
-                }
-                else if (waitType == 1) // Wait until space
-                {
-                    while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Space") == false)
-                    {
-                        yield return null;
-                    }
-                }
-                else if (waitType == 2) // Wait until Fire
-                {
-                    while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Fire") == false)
-                    {
-                        yield return null;
-                    }
-                }
-
-                actionDone = true;
-                yield break;
-            }
-        }
-
-        /// <summary>
-        /// Creates an interaction where the player chooses what to say! This one makes it so you can't go back to the menu after doing one.
-        /// </summary>
-        /// <param name="speaker">Who is talking, used in the file</param>
-        /// <param name="partID">What part is that in, used in file</param>
-        /// <param name="optionID">What optionID is it in, used in file</param>
-        /// <param name="dataName">What to call the data saved, this is used to save the player's choice to be used for different outcomes.</param>
-        /// <param name="responder">Who is saying the responses, used in the file</param>
-        /// <param name="optionID">What responseID is it in, used in file</param>
-        /// <param name="dataName">Name of the data to keep/save for later use. (Used for different outcomes)</param>
-        public IEnumerator InteractOne(string speaker, int partID, int optionID, string responder, int responseID, string dataName) // Allowing only one
-        {
-            string[] options = Choice(speaker, partID, optionID);
-            string[] responses = Responses(responder, partID, responseID);
-
-            while (true)
-            {
-                while (GetComponent<GUISystem>().DisplayChoices(options, responses, dataName, "Space") == false)
-                {
-                    yield return null;
-                }
-
-                actionDone = true;
-                yield break;
-            }
-        }
-
-        // WAITING
-
-        /// <summary>
-        /// Wait for the given amount of time until proceeding to the next action
-        /// </summary>
-        /// <param name="time">Time in seconds to wait, ex: 0.5</param>
-        public void Wait(int time)
-        {
-            StartCoroutine_Auto(WaitCo((float)time));
-        }
-
-        /// <summary>
-        /// DO NOT USE! This is only used internally!
-        /// </summary>
-        private IEnumerator WaitCo(float time)
-        {
-            yield return new WaitForSeconds(time);
-            actionDone = true;
-        }
-
-
-        /// <summary>
-        /// Wait for an input before continuing, Keyboard and KeyCodes only!
-        /// </summary>
-        /// <param name="input">QAny Keycode, Ex: Q, Esc</param>
-        public IEnumerator WaitForInput(KeyCode input)
-        {
-            while (true)
-            {
-                while (!Input.GetKeyDown(input))
-                    yield return null;
-
-                actionDone = true;
-                yield return null;
-            }
-        }
-
-        /// <summary>
-        /// Wait for an input before continuing, Referenced Unity Input only!
-        /// </summary>
-        /// <param name="input">Any KeyCode referenced in Unity's Input Manager</param>
-        public IEnumerator WaitForInput(string input)
-        {
-            while (true)
-            {
-                while (!Input.GetButtonDown(input))
-                    yield return null;
-
-                actionDone = true;
-                yield return null;
-            }
-        }
-
-
-        // CHARACTER SPRITES
-
-        // TODO: Make the displaying of character system!
-        // TODO: Make the chaging of character sprite system!
-        // TODO: Make the animation of character system!
-        // TODO: Make the removal of character system
-
-        // QUEUE
-
-        /// <summary>
-        /// Adds an action (method to execute) in a queue, which will run one after the other. EX: AddToQueue(() => Wait(1));
-        /// </summary>
-        /// <param name="action"></param>
-        public void AddToQueue(Action action)
-        {
-            actionQueue.Add(action);
-        }
-
-        /// <summary>
-        /// Executes the first action of the queue and removes it
-        /// </summary>
-        public void ExecuteQueue()
-        {
-            if (actionDone)
-            {
-                actionDone = false;
-
-                actionQueue[0]();
-
-                actionQueue.RemoveAt(0);
-            }
-        }
-
-        /// <summary>
-        /// Removes an action from the action/event queue based on index
-        /// </summary>
-        /// <param name="index">The index of the queue item to remove</param>
-        public void RemoveInQueue(int index)
-        {
-            actionQueue.RemoveAt(index);
-        }
-
-        /// <summary>
-        /// Removes a the first occurence of the given action
-        /// </summary>
-        /// <param name="action">The action to remove</param>
-        public void RemoveInQueue(Action action)
-        {
-            actionQueue.Remove(action);
-        }
-
-        /// <summary>
-        /// Allows to change actionDone's value to the given value
-        /// </summary>
-        /// <param name="set">Value to change actionDone by</param>
-        public void SetActionDone (bool set)
-        {
-            actionDone = set;
-        }
-
 
     }
 }

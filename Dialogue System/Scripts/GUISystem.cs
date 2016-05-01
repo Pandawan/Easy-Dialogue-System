@@ -57,10 +57,7 @@ namespace Dialogue
             // Note: Make the system so characters write one after the other
             text[0].text = textToDisplay;
 
-            if (text[0].text == textToDisplay)
-                return true;
-            else
-                return false;
+            return true;
         }
 
         /// <summary>
@@ -318,6 +315,12 @@ namespace Dialogue
                 btn.gameObject.SetActive(false);
                 btn.interactable = false;
             }
+        }
+
+        public void UsingSpace (string keyName)
+        {
+            text[1].text = "Press " + keyName + " to continue.";
+            text[1].enabled = true; // Press to continue
         }
 
     }
