@@ -3,16 +3,64 @@
         "Talk1": [
             "me",
             1,
-            2
+            1
         ],
-        "Wait2": [
-            5    
+        "WaitForInput2": [
+            "Space"    
         ],
         "Talk3": [
             "me",
             1,
-            1
+            2
+        ],
+        "WaitForInput4": [
+            "Space"    
+        ],
+        "Talk5": [
+            "me",
+            1,
+            3
         ]
-        
+        ,
+        "WaitForInput6": [
+            "Space"    
+        ],
+        "Talk7": [
+            "me",
+            1,
+            4
+        ],
+        "WaitForInput8": [
+            "Space"    
+        ],
+        "Talk9": [
+            "me",
+            1,
+            5
+        ],
+        "WaitForInput10": [
+            "Space"    
+        ],
+        "Talk11": [
+            "me",
+            1,
+            6
+        ],
+        "WaitForInput12": [
+            "Space"    
+        ],
+        "Talk13": [
+            "player",
+            1,
+            1
+        ],
+        "InteractOne14": [
+            "player",
+            2,
+            1,
+            "me", 
+            1, 
+            "truthChoice"
+        ]
     }
 }

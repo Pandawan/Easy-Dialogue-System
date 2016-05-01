@@ -36,7 +36,7 @@ namespace Dialogue
                 Debug.LogError("File not found or version is invalid!");
                 return;
             }
-            //Test(5);
+            //Test(7);
 
             st.ReadStory(this);
         }
@@ -96,7 +96,7 @@ namespace Dialogue
             if (testingCode == 0 || testingCode == 6)
             {
                 Debug.Log("Using Interact() with All");
-                AddToQueue(() => StartCoroutine(InteractAll("player", 0, 1, "me", 1, 1)));
+                AddToQueue(() => InteractAll("player", 0, 1, "me", 1));
                 AddToQueue(() => Wait((int)0.5));
                 AddToQueue(() => Talk("me", 1, 1));
             }
@@ -199,7 +199,7 @@ namespace Dialogue
         /// <param name="optionID">What optionID is it in, used in file</param>
         /// <param name="responder">Who is saying the responses, used in the file</param>
         /// <param name="optionID">What responseID is it in, used in file</param>
-        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
+        public IEnumerator InteractAllType(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
         {
             string[] options = Choice(speaker, partID, optionID);
             string[] responses = Responses(responder, partID, responseID);
@@ -266,7 +266,7 @@ namespace Dialogue
         /// Wait for an input before continuing, Keyboard and KeyCodes only!
         /// </summary>
         /// <param name="input">QAny Keycode, Ex: Q, Esc</param>
-        public void WaitForInput(KeyCode input) { StartCoroutine(WaitForInputCo(input)); }
+        public void WaitForInputKey(KeyCode input) { StartCoroutine(WaitForInputCo(input)); }
 
         /// <summary>
         /// Wait for an input before continuing, Referenced Unity Input only!
@@ -359,7 +359,7 @@ namespace Dialogue
                 }
 
                 actionDone = true;
-                yield return null;
+                yield break;
             }
         }
 
@@ -375,7 +375,7 @@ namespace Dialogue
                 }
 
                 actionDone = true;
-                yield return null;
+                yield break;
             }
         }
 
