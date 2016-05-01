@@ -68,6 +68,7 @@ namespace Dialogue
         /// <returns></returns>
         public bool DisplayChoices(string[] choices, string[] responses)
         {
+            
             int allUsed = 0; // Number of options that were used, 4 if all
             foreach (bool use in optionUsed)
             {
@@ -133,7 +134,6 @@ namespace Dialogue
                 {
                     // Set to using choices
                     UsingChoices();
-
                     for (int i = 0; i < choices.Length; i++)
                     {
                         // Enable buttons and set their text to choice
@@ -172,6 +172,7 @@ namespace Dialogue
 
         public bool DisplayChoices(string[] choices, string[] responses, string buttonType)
         {
+
             int allUsed = 0; // Number of options that were used, 4 if all
             foreach (bool use in optionUsed)
             {
@@ -187,7 +188,6 @@ namespace Dialogue
                 {
                     // Set to using choices
                     UsingChoices();
-
                     for (int i = 0; i < choices.Length; i++)
                     {
                         // Enable buttons and set their text to choice
