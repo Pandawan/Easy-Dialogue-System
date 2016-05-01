@@ -35,11 +35,15 @@ namespace Dialogue
         /// Displays the text given as a title
         /// </summary>
         /// <param name="title">Text to display</param>
-        public void DisplayTitle (string title)
+        public IEnumerator DisplayTitle (string title, int time)
         {
             UsingTitle();
 
             text[2].text = title;
+
+            yield return new WaitForSeconds((float)time);
+
+            GetComponent<DialogueSystem>().SetActionDone(true);
         }
 
         /// <summary>
@@ -227,7 +231,6 @@ namespace Dialogue
                 if (optionUsed[i] && buttons[i].interactable || buttons[i].GetComponentInChildren<Text>().text == " " && buttons[i].interactable)
                 {
                     buttons[i].interactable = false;
-                    Debug.Log("Uninteractabling buttons!");
                 }
             }
         }
@@ -301,7 +304,19 @@ namespace Dialogue
             {
                 btn.gameObject.SetActive(true);
                 btn.interactable = true;
-                Debug.Log("Using buttons! (Active + Interactable)");
+            }
+        }
+
+        private void UsingNone()
+        {
+            text[0].enabled = false; // Original Text
+            text[1].enabled = false; // Press to continue
+            text[2].enabled = false; // Title
+
+            foreach (Button btn in buttons)
+            {
+                btn.gameObject.SetActive(false);
+                btn.interactable = false;
             }
         }
 

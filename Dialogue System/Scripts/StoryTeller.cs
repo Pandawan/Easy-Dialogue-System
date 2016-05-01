@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Dialogue
 {
-    public class StoryTeller : MonoBehaviour
+    public class StoryTeller
     {
         // TODO: Make Story Teller
 

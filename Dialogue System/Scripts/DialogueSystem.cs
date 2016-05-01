@@ -36,7 +36,7 @@ namespace Dialogue
                 Debug.LogError("File not found or version is invalid!");
                 return;
             }
-            Test(6);
+            Test(7);
 
             //st.ReadStory(this);
         }
@@ -103,7 +103,7 @@ namespace Dialogue
             if (testingCode == 0 || testingCode == 7)
             {
                 Debug.Log("Displaying Title()");
-                AddToQueue(() => Title(1));
+                AddToQueue(() => Title(1, 2));
             }
         }
 
@@ -133,6 +133,7 @@ namespace Dialogue
         {
             return Node["dialogue"]["part" + partID]["part_name"];
         }
+
         /// <summary>
         /// Returns the name of the character based on the speaker id
         /// </summary>
@@ -237,9 +238,10 @@ namespace Dialogue
         /// Displays the text given as a title
         /// </summary>
         /// <param name="partID">Text to display</param>
-        public void Title(int partID)
+        /// <param name="time">Time in seconds that the title should show</param>
+        public void Title(int partID, int time)
         {
-            GetComponent<GUISystem>().DisplayTitle(Part(partID));
+            GetComponent<GUISystem>().DisplayTitle(Part(partID), time)
         }
 
 
@@ -446,6 +448,15 @@ namespace Dialogue
         public void RemoveInQueue(Action action)
         {
             actionQueue.Remove(action);
+        }
+
+        /// <summary>
+        /// Allows to change actionDone's value to the given value
+        /// </summary>
+        /// <param name="set">Value to change actionDone by</param>
+        public void SetActionDone (bool set)
+        {
+            actionDone = set;
         }
 
 
