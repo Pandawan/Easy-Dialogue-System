@@ -36,9 +36,9 @@ namespace Dialogue
                 Debug.LogError("File not found or version is invalid!");
                 return;
             }
-            Test(5);
+            //Test(5);
 
-            //st.ReadStory(this);
+            st.ReadStory(this);
         }
 
         void Update()
@@ -89,7 +89,7 @@ namespace Dialogue
             {
                 Debug.Log("Testing WaitForInput()");
                 AddToQueue(() => Talk("me", 1, 2));
-                AddToQueue(() => WaitForInput("Return"));
+                AddToQueue(() => WaitForInput("Space"));
                 AddToQueue(() => Talk("me", 1, 1));
             }
 
@@ -366,17 +366,14 @@ namespace Dialogue
         //Does all the work
         private IEnumerator WaitForInputCo(string input)
         {
-            Debug.Log("Oh Yeah!");
             while (true)
             {
                 while (!Input.GetButtonDown(input))
                 {
                     GetComponent<GUISystem>().UsingSpace(input);
-                    Debug.Log("Waiting for input");
                     yield return null;
                 }
 
-                Debug.Log("Found input!");
                 actionDone = true;
                 yield return null;
             }
