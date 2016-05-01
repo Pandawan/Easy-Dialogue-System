@@ -224,9 +224,10 @@ namespace Dialogue
         {
             for (int i = 0; i < buttons.Count; i++)
             {
-                if (optionUsed[i] || buttons[i].GetComponentInChildren<Text>().text == string.Empty)
+                if (optionUsed[i] && buttons[i].interactable || buttons[i].GetComponentInChildren<Text>().text == " " && buttons[i].interactable)
                 {
                     buttons[i].interactable = false;
+                    Debug.Log("Uninteractabling buttons!");
                 }
             }
         }
@@ -299,6 +300,8 @@ namespace Dialogue
             foreach (Button btn in buttons)
             {
                 btn.gameObject.SetActive(true);
+                btn.interactable = true;
+                Debug.Log("Using buttons! (Active + Interactable)");
             }
         }
 

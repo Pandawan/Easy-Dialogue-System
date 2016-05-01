@@ -20,8 +20,9 @@
                     "Choice 1",
                     "Choice 2",
                     "Choice 3",
-                    "Choice 4"
-                ]
+                    " "
+                ],
+                "comment1": "You can put a space in one of the choices to disable it"
             }
         },
         "part1" :{

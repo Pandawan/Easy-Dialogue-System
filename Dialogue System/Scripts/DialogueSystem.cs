@@ -36,9 +36,9 @@ namespace Dialogue
                 Debug.LogError("File not found or version is invalid!");
                 return;
             }
-            //Test(6);
+            Test(6);
 
-            st.ReadStory(this);
+            //st.ReadStory(this);
         }
 
         void Update()
@@ -158,8 +158,7 @@ namespace Dialogue
 
             for (int i = 0; i < options.Count; i++)
             {
-                if (options[i] != "" && options[i] != " ")
-                    optionsFinal.Add(options[i].ToString().Trim('"'));
+                optionsFinal.Add(options[i].ToString().Trim('"'));
             }
 
             return optionsFinal.ToArray();
@@ -180,8 +179,7 @@ namespace Dialogue
 
             for (int i = 0; i < options.Count; i++)
             {
-                if (options[i] != "" && options[i] != " ")
-                    optionsFinal.Add(CharacterName(speaker) + ": " + options[i].ToString().Trim('"'));
+                optionsFinal.Add(CharacterName(speaker) + ": " + options[i].ToString().Trim('"'));
             }
 
             return optionsFinal.ToArray();
