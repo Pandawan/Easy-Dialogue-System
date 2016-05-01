@@ -1,0 +1,61 @@
+{
+    "version": "1.0",
+    "characters" :{
+        "me": "TestingChar",
+        "player": ""
+    },
+    "dialogue": {
+        "part0" :{
+            "part_name": "Testing",
+            "me" : {
+                "response1":[
+                    "Response 1",
+                    "Response 2",
+                    "Response 3",
+                    "Response 4"
+                ]
+            },
+            "player" : {
+                "option1" :[
+                    "Choice 1",
+                    "Choice 2",
+                    "Choice 3",
+                    "Choice 4"
+                ]
+            }
+        },
+        "part1" :{
+            "part_name": "Rambling",
+            "me": {
+                "text1": "Yeah, so....",
+                "text2": "How could I say it...",
+                "text3": "...",
+                "text4": "Hum... Ok",
+                "text5": "I... I'm gay",
+                "text6": "I'm gay."
+            },
+            "player": {
+                "text1": "..."
+            }
+        },
+        "part2" :{
+            "part_name": "The Truth",
+            "me" : {
+                "response1":[
+                    "Thank god!",
+                    "Yeah...",
+                    "NO!",
+                    "WHAT?!"
+                ]
+            },
+            "player" : {
+                "option1" :[
+                    "Hey, it's cool!",
+                    "That was unexpected...",
+                    "WHAT! Are you crazy?",
+                    "Get out!"
+                ]
+            }
+        }
+    }
+}

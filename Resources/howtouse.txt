@@ -1,0 +1,74 @@
+HOW TO USE
+1. Dialogue.json
+2. Story.json
+
+
+
+2. Story.json
+This system uses actions, each run one after the other.
+To create an action, there's a specific patter you have to follow.
+Inside the "story" category you can create your actions. Here's the pattern
+
+"ActionName#":[
+    "ParameterText",
+    ParameterNum
+]
+
+The number of parameters varies based on the specific action.
+- ActionName# refers to the name of the action to run followed by a number* ex: "Talk1" * The # must be different every time and does not detemine the order.
+- If your action needs a text, you can use quotation marks with any text you want inside. Ex: "Hello, it's me!"
+- If your action needs a number, you can just type your number without quotation marks.
+
+
+Please note that between each action and/or parameters, you need a , (comma) to separate them
+Ex: 
+"Talk1":[
+    "me",
+    1,
+    2
+],
+"Wait2":[
+    1
+]
+
+Here are the current actions available and their required parameters
+
+Talk - Displays a dialogue
+    - Text: Who is saying the dialogue (characters id in dialogue.json)
+    - Number: The PartID, what part is the dialogue in
+    - Number: The TextID, what text to use from the characters
+Ex: This would display me's text 2 in part 1
+"Talk1":[
+    "me",
+    1,
+    2
+]
+
+Title - Displays the part's name as a big title
+    - Number: The PartID, which part's name to display
+Ex: This would display part3's part_name
+"Title":[
+    3
+]
+
+Wait - Waits a certain amount of seconds
+    - Number: How much time to wait (in seconds)
+Ex: This would wait 5s
+"Wait1":[
+    1
+]
+
+WaitForInput - Waits until a certain key is pressed
+    - Text: Name/ID of the key to press*
+Ex: This would wait until Space is pressed
+"WaitForInput":[
+    "Space"
+]
+
+
+* Has to be one of the registered keys listed here:
+"Space" - Space bar,
+"Escape" - Esc key,
+"Return" - Return/Enter key,
+"Horizontal" - A and D keys,
+"Vertical" - W and S keys
