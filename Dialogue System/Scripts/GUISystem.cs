@@ -106,6 +106,10 @@ namespace Dialogue
             else
             {
                 // End
+                foreach (Button button in buttons)
+                {
+                    button.GetComponentInChildren<Text>().text = "";
+                }
                 return true;
             }
 
@@ -155,6 +159,10 @@ namespace Dialogue
             else
             {
                 // End
+                foreach (Button button in buttons)
+                {
+                    button.GetComponentInChildren<Text>().text = "";
+                }
                 UsingText();
                 PlayerPrefs.SetInt(dataName, lastChoiceUsed);
                 return true;
@@ -204,6 +212,10 @@ namespace Dialogue
             else
             {
                 // End
+                foreach (Button button in buttons)
+                {
+                    button.GetComponentInChildren<Text>().text = "";
+                }
                 return true;
             }
         }
@@ -212,7 +224,7 @@ namespace Dialogue
         {
             for (int i = 0; i < buttons.Count; i++)
             {
-                if (optionUsed[i])
+                if (optionUsed[i] || buttons[i].GetComponentInChildren<Text>().text == string.Empty)
                 {
                     buttons[i].interactable = false;
                 }

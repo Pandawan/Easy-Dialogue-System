@@ -46,8 +46,8 @@ namespace Dialogue
             if (actionQueue.Count > 0)
                 ExecuteQueue();
         }
-        
-        
+
+
         //TESTING
 
         // 0: All, 1: Dialogue, 2: Part, 3: Interact, 4: Queue System, 5: Choice System All, 6: Choice System One
@@ -87,7 +87,7 @@ namespace Dialogue
             if (testingCode == 0 || testingCode == 5)
             {
                 Debug.Log("Using Interact() with All");
-                AddToQueue(() => StartCoroutine(Interact("player", 0, 1, "me", 1, 1)));
+                AddToQueue(() => StartCoroutine(InteractAll("player", 0, 1, "me", 1, 1)));
                 AddToQueue(() => Wait((int)0.5));
                 AddToQueue(() => Talk("me", 1, 1));
             }
@@ -95,7 +95,7 @@ namespace Dialogue
             if (testingCode == 0 || testingCode == 6)
             {
                 Debug.Log("Using Interact() with Only one");
-                AddToQueue(() => StartCoroutine(Interact("player", 0, 1, "me", 1, "Part2")));
+                AddToQueue(() => StartCoroutine(InteractOne("player", 0, 1, "me", 1, "Part2")));
                 AddToQueue(() => Wait((int)0.5));
                 AddToQueue(() => Talk("me", 1, 1));
             }
@@ -230,7 +230,7 @@ namespace Dialogue
         /// <param name="speaker">Speaker saying the dialogue</param>
         /// <param name="partID">Part of the dialogue</param>
         /// <param name="textID">Id of the text to use</param>
-        public void Talk (string speaker, int partID, int textID)
+        public void Talk(string speaker, int partID, int textID)
         {
             DisplayDialogue(Dialogue(speaker, partID, textID));
         }
@@ -239,7 +239,7 @@ namespace Dialogue
         /// Displays the text given as a title
         /// </summary>
         /// <param name="partID">Text to display</param>
-        public void Title (int partID)
+        public void Title(int partID)
         {
             GetComponent<GUISystem>().DisplayTitle(Part(partID));
         }
@@ -255,7 +255,34 @@ namespace Dialogue
         /// <param name="optionID">What optionID is it in, used in file</param>
         /// <param name="responder">Who is saying the responses, used in the file</param>
         /// <param name="optionID">What responseID is it in, used in file</param>
-        public IEnumerator Interact(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
+        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID) // Allowing all of them
+        {
+            string[] options = Choice(speaker, partID, optionID);
+            string[] responses = Responses(responder, partID, responseID);
+
+            while (true)
+            {
+
+                while (GetComponent<GUISystem>().DisplayChoices(options, responses, "Space") == false)
+                {
+                    yield return null;
+                }
+
+                actionDone = true;
+                yield break;
+            }
+        }
+
+
+        /// <summary>
+        /// Creates an interaction where the player chooses what to say! This one makes it so you go back to the menu after doing one.
+        /// </summary>
+        /// <param name="speaker">Who is talking, used in the file</param>
+        /// <param name="partID">What part is that in, used in file</param>
+        /// <param name="optionID">What optionID is it in, used in file</param>
+        /// <param name="responder">Who is saying the responses, used in the file</param>
+        /// <param name="optionID">What responseID is it in, used in file</param>
+        public IEnumerator InteractAll(string speaker, int partID, int optionID, string responder, int responseID, int waitType) // Allowing all of them
         {
             string[] options = Choice(speaker, partID, optionID);
             string[] responses = Responses(responder, partID, responseID);
@@ -301,7 +328,7 @@ namespace Dialogue
         /// <param name="responder">Who is saying the responses, used in the file</param>
         /// <param name="optionID">What responseID is it in, used in file</param>
         /// <param name="dataName">Name of the data to keep/save for later use. (Used for different outcomes)</param>
-        public IEnumerator Interact(string speaker, int partID, int optionID, string responder, int responseID, string dataName) // Allowing only one
+        public IEnumerator InteractOne(string speaker, int partID, int optionID, string responder, int responseID, string dataName) // Allowing only one
         {
             string[] options = Choice(speaker, partID, optionID);
             string[] responses = Responses(responder, partID, responseID);
@@ -338,7 +365,7 @@ namespace Dialogue
             actionDone = true;
         }
 
-       
+
         /// <summary>
         /// Wait for an input before continuing, Keyboard and KeyCodes only!
         /// </summary>
@@ -409,7 +436,7 @@ namespace Dialogue
         /// Removes an action from the action/event queue based on index
         /// </summary>
         /// <param name="index">The index of the queue item to remove</param>
-        public void RemoveInQueue (int index)
+        public void RemoveInQueue(int index)
         {
             actionQueue.RemoveAt(index);
         }
@@ -423,6 +450,6 @@ namespace Dialogue
             actionQueue.Remove(action);
         }
 
-        
+
     }
 }
